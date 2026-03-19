@@ -7,15 +7,14 @@ const Chatbot = () => {
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    const userText = input; // store before clearing
+    const userText = input;
 
-    // add user message immediately
     setMessages((prev) => [
       ...prev,
       { sender: "user", text: userText },
     ]);
 
-    setInput(""); // clear input early
+    setInput("");
 
     try {
       const response = await fetch(
@@ -31,20 +30,19 @@ const Chatbot = () => {
 
       const data = await response.json();
 
-      // add bot reply safely
       setMessages((prev) => [
         ...prev,
         {
           sender: "bot",
-          text: data.reply || "No response from AI",
+          text: data.reply,
         },
       ]);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("API ERROR:", error);
 
       setMessages((prev) => [
         ...prev,
-        { sender: "bot", text: "Server error" },
+        { sender: "bot", text: "Backend not reachable" },
       ]);
     }
   };
