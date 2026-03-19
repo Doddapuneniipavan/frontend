@@ -5,41 +5,48 @@ const Chatbot = () => {
   const [messages, setMessages] = useState([]);
 
   const sendMessage = async () => {
-    if (!input) return;
+    if (!input.trim()) return;
 
-    // add user message instantly
-    const userMsg = { sender: "user", text: input };
-    setMessages((prev) => [...prev, userMsg]);
+    const userText = input; // store before clearing
+
+    // add user message immediately
+    setMessages((prev) => [
+      ...prev,
+      { sender: "user", text: userText },
+    ]);
+
+    setInput(""); // clear input early
 
     try {
-      const response = await fetch("https://backend-ai-l8mn.onrender.com/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: input,
-        }),
-      });
+      const response = await fetch(
+        "https://backend-ai-l8mn.onrender.com/chat",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message: userText }),
+        }
+      );
 
       const data = await response.json();
 
-      // add bot reply
+      // add bot reply safely
       setMessages((prev) => [
         ...prev,
-        { sender: "bot", text: data.reply },
+        {
+          sender: "bot",
+          text: data.reply || "No response from AI",
+        },
       ]);
-
     } catch (error) {
-      console.error(error);
+      console.error("Error:", error);
 
       setMessages((prev) => [
         ...prev,
         { sender: "bot", text: "Server error" },
       ]);
     }
-
-    setInput("");
   };
 
   return (
@@ -70,6 +77,7 @@ const Chatbot = () => {
           placeholder="Type message..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
         />
 
         <button style={styles.button} onClick={sendMessage}>
