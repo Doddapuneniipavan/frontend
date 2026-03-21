@@ -10,6 +10,7 @@ import Careers from "./pages/Careers";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Admin from "./pages/Admin";
+import Login from "./pages/Login";
 
 function App() {
   return (
@@ -21,9 +22,18 @@ function App() {
         <Route path="/careers" element={<Careers />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/admin" element={<Admin />} />
 
-        {/* CHATBOT ROUTE */}
+        {/* 🔐 PROTECTED ADMIN */}
+        <Route
+          path="/admin"
+          element={
+            localStorage.getItem("admin") === "true"
+              ? <Admin />
+              : <Login />
+          }
+        />
+
+        {/* CHATBOT */}
         <Route path="/chat" element={<Chatbot />} />
       </Routes>
     </Router>
